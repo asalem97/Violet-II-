@@ -3,50 +3,37 @@
 #February 10, 2025
 
 
+import gpiod
 import time
-import os
 
-# Define GPIO pin (Pin 2 on Header 1 corresponds to GPIO1_18)
-GPIO_PIN = 18
+GPIO_CHIP = "gpiochip3"
+GPIO_LINE = 10  # P1_2
 
-# Export the GPIO pin 
-def export_gpio(pin):
-	if not os.path.exists(f'/sys/class/gpio/gpio{pin}'):
-		with open('/sys/class/gpio/export', 'w') as f:
-			f.write(str(pin))
+# Release GPIO if already in use
+chip = gpiod.Chip(GPIO_CHIP)
+line = chip.get_line(GPIO_LINE)
+try:
+    # If the GPIO is already requested, release it first
+    if line.consumer():
+        print("GPIO is already in use. Releasing it first...")
+        line.release()
+        time.sleep(1)  # Wait a moment before re-requesting
 
-# Set the direction of the GPIO pin 
-def set_gpio_direction(pin, direction):
-	with open(f'/sys/class/gpio/gpio{pin}/direction', 'w') as f:
-		f.write(direction)
+    # Request GPIO for control
+    line.request(consumer="P1_2_Control", type=gpiod.LINE_REQ_DIR_OUT)
 
-# Write value to GPIO pin 
-def write_gpio(pin, value):
-	with open(f'/sys/class/gpio/gpio{pin}/value', 'w') as f:
-		f.write(str(value))
+    while True:
+        print("P1_2 HIGH")
+        line.set_value(1)
+        time.sleep(2)
 
-# Clean up and unexport the GPIO pin
-def unexport_gpio(pin):
-	with open('/sys/class/gpio/unexport', 'w') as f:
-		f.write(str(pin))
-
-# Main program to control the GPIO pin
-# Export and set up the GPIO pin
-	export_gpio(GPIO_PIN)
-	set_gpio_direction(GPIO_PIN, 'out')
-
-	while True:
-		# Turn the GPIO pin on (HIGH)
-		write_gpio(GPIO_PIN, 1)
-		time.sleep(120)  # Wait for 120 second
-
-		# Turn the GPIO pin off (LOW)
-		write_gpio(GPIO_PIN, 0)
-		time.sleep(120)  # Wait for 120 second
+        print("P1_2 LOW")
+        line.set_value(0)
+        time.sleep(2)
 
 except KeyboardInterrupt:
+    print("\nExiting...")
 
 finally:
-	# Clean up
-	unexport_gpio(GPIO_PIN)
-
+    print("Releasing GPIO")
+    line.release()

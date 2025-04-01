@@ -5,10 +5,10 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: Ettus B205 Loopback FSK Test
-# Author: Bradford MacEwen
+# Title: limesdr FSK loopback
+# Author: Abdulaziz Salem
 # Copyright: 2024
-# Description: Sends data with FSK through Ettus SDR
+# Description: Sends data with FSK through lime SDR mini
 # GNU Radio version: 3.8.5.0
 
 import os
@@ -35,7 +35,7 @@ import limesdr
 class limesdr_FSK_loopback(gr.top_block):
 
     def __init__(self, baud_rate=1200, equ_gain=0.01, excess_bw=0.35, fc_rx=436.83e6, fc_tx=145.91e6, loop_bw=0.0628, rx_gain_default=56, sps=160, tx_gain_56=56):
-        gr.top_block.__init__(self, "Ettus B205 Loopback FSK Test")
+        gr.top_block.__init__(self, "limesdr FSK loopback")
 
         ##################################################
         # Parameters
@@ -55,7 +55,6 @@ class limesdr_FSK_loopback(gr.top_block):
         ##################################################
         self.samp_rate = samp_rate = baud_rate*sps
         self.rrc_taps = rrc_taps = firdes.root_raised_cosine(1.0,samp_rate,2*samp_rate/sps,excess_bw,11*sps)
-        self.bpsk_obj = bpsk_obj = digital.constellation_bpsk().base()
 
         ##################################################
         # Blocks
@@ -121,7 +120,7 @@ class limesdr_FSK_loopback(gr.top_block):
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_ff(
             digital.TED_SIGNUM_TIMES_SLOPE_ML,
             sps,
-            0.45,
+            0.450,
             1.0,
             1.0,
             1.5,
@@ -251,17 +250,11 @@ class limesdr_FSK_loopback(gr.top_block):
     def set_rrc_taps(self, rrc_taps):
         self.rrc_taps = rrc_taps
 
-    def get_bpsk_obj(self):
-        return self.bpsk_obj
-
-    def set_bpsk_obj(self, bpsk_obj):
-        self.bpsk_obj = bpsk_obj
-
 
 
 
 def argument_parser():
-    description = 'Sends data with FSK through Ettus SDR'
+    description = 'Sends data with FSK through lime SDR mini'
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "--baud-rate", dest="baud_rate", type=intx, default=1200,

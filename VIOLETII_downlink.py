@@ -18,7 +18,7 @@ receive_port = 27000
 UDP_HOST = "127.0.0.1" 
 UDP_PORT = 27001
 
-#DestinationCallsign = "VE9CNB" = CubeSatNB Ground Station
+#DestinationCallsign = "VE9UNB" = CubeSatNB Ground Station
 #DestinationCallsign = "AC8A72869C84" # Converted to proper left shifted format in HEX
 DestinationCallsign = "AC8A72AA9C84"
 DestinationSSID = "E2" # Bit 7 set to 0 indicating source SSID **
